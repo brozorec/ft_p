@@ -1,32 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_p.h                                             :+:      :+:    :+:   */
+/*   get_next_line.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/03/04 18:23:42 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/06 19:32:30 by bbarakov         ###   ########.fr       */
+/*   Created: 2014/11/16 16:57:39 by bbarakov          #+#    #+#             */
+/*   Updated: 2015/03/05 15:08:20 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FT_P_H
-# define FT_P_H
+#ifndef GET_NEXT_LINE_H
+# define GET_NEXT_LINE_H
+# define BUFF_SIZE 10
 
-# include <sys/socket.h>
-# include <stdio.h>
-# include <stdlib.h>
 # include <unistd.h>
-# include <netdb.h>
-# include <netinet/in.h>
-# include <arpa/inet.h>
-# include <signal.h>
-# include <sys/wait.h>
+# include <stdlib.h>
 # include "./libft/includes/libft.h"
-# include "get_next_line.h"
 
-void		err_msg(char *err);
-void		usage(char *str);
-int 		get_next_line(int fd, char **line);
+typedef struct			s_struct
+{
+	int					index;
+	char				*content;
+	struct s_struct		*next;
+}						t_struct;
+
+int						get_next_line(int const fd, char **line);
 
 #endif
