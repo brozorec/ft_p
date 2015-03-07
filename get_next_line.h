@@ -6,13 +6,13 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/16 16:57:39 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/05 15:08:20 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/07 18:02:30 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
-# define BUFF_SIZE 10
+# define BUFF_SIZE 1024
 
 # include <unistd.h>
 # include <stdlib.h>

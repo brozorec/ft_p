@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/04 18:23:03 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/06 19:50:58 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/07 18:46:44 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,35 +45,6 @@ int			create_socket(int port)
 	return (sfd);
 }
 
-void		forked_examine_buff(char *buff, int cfd)
-{
-	if (ft_strcmp(buff, "ls") == 0)
-	{
-		if (execl("/bin/ls", "ls", 0) == -1)
-			err_msg("execl() failed.\n");
-	}
-	if (ft_strcmp(buff, "quit") == 0)
-	{
-		close(cfd);
-		exit(0);
-	}
-}
-
-void		forked_proceed(int cfd)
-{
-	char				*buff;
-	int 				ret;
-
-	while ((ret = get_next_line(cfd, &buff)) != -1)
-	{
-		buff[ret - 1] = '\0';
-		forked_examine_buff(buff, cfd);
-		free(buff);
-		// printf("%s\n", buff);
-	}
-	err_msg("GNL failed.\n");
-}
-
 void		accept_connections(int sfd)
 {
 	int					cfd;
@@ -89,10 +60,9 @@ void		accept_connections(int sfd)
 		if ((child = fork()) == 0)
 		{
 			close(sfd);
-			forked_proceed(cfd);
+			forked_process(cfd);
 		}
-		wait(0);
-		printf("%s\n", "tuk");
+		printf("%s\n", "new client");
 		close(cfd);
 	}
 }
