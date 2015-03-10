@@ -6,7 +6,7 @@
 #    By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2015/03/09 12:02:33 by bbarakov          #+#    #+#              #
-#    Updated: 2015/03/09 13:59:59 by bbarakov         ###   ########.fr        #
+#    Updated: 2015/03/10 17:45:31 by bbarakov         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,6 +29,8 @@ OBJ1=		$(SRC1:.c=.o)
 SRC2=		dir_client/client.c \
 			dir_client/errors.c \
 			dir_client/get_next_line.c \
+			dir_client/interaction.c \
+			dir_client/menage_files.c \
 
 OBJ2=		$(SRC2:.c=.o)
 
