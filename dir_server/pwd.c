@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/07 16:56:25 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/07 18:42:52 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/10 16:28:35 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,11 +55,11 @@ void		do_pwd(char **tab, int cfd)
 
 	if (tab[1] != 0)
 	{
-		if (send(cfd, "ERROR\nUsage pwd: pwd <no options>\n", 34, MSG_DONTWAIT) == -1)
+		if (send(cfd, "ERROR\nUsage pwd: pwd <no options>\r\n", 35, MSG_DONTWAIT) == -1)
 			err_msg("send() pwd failed.\n");
 		return ;
 	}
 	print_cwd();
-	if (send(cfd, "SUCCESS\n", 8, MSG_DONTWAIT) == -1)
+	if (send(cfd, "SUCCESS\r\n", 9, MSG_DONTWAIT) == -1)
 		err_msg("send() pwd failed.\n");
 }

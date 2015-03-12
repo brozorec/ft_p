@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/07 18:10:25 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/09 17:57:20 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/10 16:29:33 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,14 @@ void		forked_examine_buff(char *buff, int cfd)
 		send_file(tab, cfd);
 	else if (ft_strcmp(buff, "quit") == 0)
 	{
-		if (send(cfd, "SUCCESS\nConnection closed.\n", 27, MSG_DONTWAIT) == -1)
+		if (send(cfd, "SUCCESS\nConnection closed.\r\n", 28, MSG_DONTWAIT) == -1)
 			err_msg("send() forked_examine_buff failed.\n");
 		close(cfd);
 		exit(0);
 	}
 	else
 	{
-		if (send(cfd, "ERROR\nCommand line.\n", 20, MSG_DONTWAIT) == -1)
+		if (send(cfd, "ERROR\nCommand line.\r\n", 21, MSG_DONTWAIT) == -1)
 			err_msg("send() forked_examine_buff failed.\n");
 	}
 	free(tab);
@@ -47,10 +47,11 @@ void		forked_process(int cfd)
 
 	while ((ret = recv(cfd, buff, 1023, 0)) > 0)
 	{
+		// dump(buff, ret);
 		buff[ret] = '\0';
 		if (ft_strlen(buff) == 0)
 			continue ;
 		forked_examine_buff(buff, cfd);
 	}
-	err_msg("GNL failed.\n");
+	err_msg("Connection closed by the client.\n");
 }

@@ -29,7 +29,7 @@ void			read_dir_loop(DIR *dirp, int cfd)
 		if (entry == 0 && errno == 0)
 			break ;
 	}
-	if (send(cfd, "SUCCESS\n", 8, MSG_DONTWAIT) == -1)
+	if (send(cfd, "SUCCESS\r\n", 9, MSG_DONTWAIT) == -1)
 		err_msg("send() readdir failed.\n");
 }
 
@@ -39,7 +39,7 @@ void			do_ls(char **tab, int cfd)
 
 	if (tab[1] != 0)
 	{
-		if (send(cfd, "ERROR\nUsage ls: ls <no options>\n", 32, MSG_DONTWAIT) == -1)
+		if (send(cfd, "ERROR\nUsage ls: ls <no options>\r\n", 33, MSG_DONTWAIT) == -1)
 			err_msg("send() readdir failed.\n");
 		return ;
 	}

@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/10 17:14:28 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/10 17:46:36 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/12 13:28:47 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,39 +21,41 @@ void		send_msg(char *buff, int cfd)
 		err_msg("send() send_msg failed.\n");
 }
 
-void		print_received_msg(int cfd)
+char		*receive_msg(int cfd)
 {
 	char				buff_recv[1024];
+	char				*msg;
 	int 				ret;
 	int 				matched;
 
+	msg = 0;
 	matched = 0;
 	while ((ret = recv(cfd, buff_recv, 1023, 0)) > 0)
 	{
 		buff_recv[ret] = '\0';
 		if (ft_strstr(buff_recv, "\r\n") != 0)
 		{
-			ft_putstr(buff_recv);
-			return ;
+			buff_recv[ret - 2] = '\0';
+			msg = ft_realloc(msg, ft_strlen(buff_recv) + 1);
+			msg = ft_strcat(msg, buff_recv);
+			return (msg);
 		}
-		if (matched == 1)
+		else if (matched == 1)
 		{
 			if (buff_recv[0] == '\n')
-			{
-				ft_putstr(buff_recv);
-				return ;
-			}
+				return (msg);
 			else
 				matched = 0;
 		}
-		if (ft_strlen(buff_recv) > 0 && buff_recv[ret - 1] == '\r')
+		else if (ft_strlen(buff_recv) > 0 && buff_recv[ret - 1] == '\r')
 		{
 			buff_recv[ret - 1] = '\0';
 			matched++;
 		}
-		ft_putstr(buff_recv);
+		msg = ft_realloc(msg, ft_strlen(buff_recv) + 1);
+		msg = ft_strcat(msg, buff_recv);
 	}
-
+	return (msg);
 }
 
 void		examine_input(char *buff_input, int cfd)
@@ -61,17 +63,22 @@ void		examine_input(char *buff_input, int cfd)
 	if (ft_strncmp(buff_input, "ls", 2) == 0)
 	{
 		send_msg(buff_input, cfd);
-		print_received_msg(cfd);
+		printf("%s\n", receive_msg(cfd));
 	}
 	else if (ft_strncmp(buff_input, "pwd", 3) == 0)
 	{
 		send_msg(buff_input, cfd);
-		print_received_msg(cfd);
+		printf("%s\n", receive_msg(cfd));
 	}
 	else if (ft_strncmp(buff_input, "get", 3) == 0)
 	{
 		send_msg(buff_input, cfd);
-		receive_file(cfd);
+		receive_file(cfd, buff_input + 4);
+	}
+	else
+	{
+		send_msg(buff_input, cfd);
+		printf("%s\n", receive_msg(cfd));
 	}
 }
 
