@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/04 18:23:42 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/10 17:43:26 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/13 14:17:03 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,10 @@ void		err_msg(char *err);
 void		usage(char *str);
 int 		get_next_line(int fd, char **line);
 void		do_ls(char **tab, int cfd);
+void		do_cd(char **tab, int cfd, char *starting_dir);
+char		*take_env_var(void);
 void		do_pwd(char **tab, int cfd);
+char		*take_cwd(void);
 void		send_file(char **tab, int cfd);
 void		forked_process(int cfd);
 

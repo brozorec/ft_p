@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/04 18:23:03 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/07 18:46:44 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/13 14:48:06 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ void		accept_connections(int sfd)
 			close(sfd);
 			forked_process(cfd);
 		}
-		printf("%s\n", "new client");
+		printf("%s\n", "New client");
 		close(cfd);
 	}
 }
@@ -74,7 +74,7 @@ int			main(int ac, char **av)
 
 	if (ac != 2)
 		usage(av[0]);
-	if ((port = ft_atoi(av[1])) == 0)
+	if ((port = ft_atoi(av[1])) == 0  || port < 1025)
 		err_msg("Enter valid port.\n");
 	signal(SIGCHLD, sig_child);
 	sfd = create_socket(port);

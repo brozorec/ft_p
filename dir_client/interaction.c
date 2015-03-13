@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/10 17:14:28 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/12 13:28:47 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/13 18:39:48 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,62 +23,72 @@ void		send_msg(char *buff, int cfd)
 
 char		*receive_msg(int cfd)
 {
-	char				buff_recv[1024];
-	char				*msg;
-	int 				ret;
 	int 				matched;
+	char				buff_recv[2];
+	char				*msg;
+	char				*save;
 
 	msg = 0;
 	matched = 0;
-	while ((ret = recv(cfd, buff_recv, 1023, 0)) > 0)
+	while (recv(cfd, &buff_recv[0], 1, 0) > 0)
 	{
-		buff_recv[ret] = '\0';
-		if (ft_strstr(buff_recv, "\r\n") != 0)
-		{
-			buff_recv[ret - 2] = '\0';
-			msg = ft_realloc(msg, ft_strlen(buff_recv) + 1);
-			msg = ft_strcat(msg, buff_recv);
-			return (msg);
-		}
+		buff_recv[1] = '\0';
+		if (buff_recv[0] == '\r')
+			++matched;
 		else if (matched == 1)
 		{
 			if (buff_recv[0] == '\n')
+			{
+				msg[ft_strlen(msg) - 1] = '\0';
 				return (msg);
+			}
 			else
 				matched = 0;
 		}
-		else if (ft_strlen(buff_recv) > 0 && buff_recv[ret - 1] == '\r')
-		{
-			buff_recv[ret - 1] = '\0';
-			matched++;
-		}
-		msg = ft_realloc(msg, ft_strlen(buff_recv) + 1);
-		msg = ft_strcat(msg, buff_recv);
+		save = ft_strdup(msg);
+		free(msg);
+		msg = ft_strjoin(save, buff_recv);
+		free(save);
 	}
 	return (msg);
 }
 
 void		examine_input(char *buff_input, int cfd)
 {
+	char				*buff;
+
 	if (ft_strncmp(buff_input, "ls", 2) == 0)
 	{
 		send_msg(buff_input, cfd);
-		printf("%s\n", receive_msg(cfd));
+		buff = receive_msg(cfd);
+		printf("%s\n", buff);
+		ft_strdel(&buff);
 	}
 	else if (ft_strncmp(buff_input, "pwd", 3) == 0)
 	{
 		send_msg(buff_input, cfd);
-		printf("%s\n", receive_msg(cfd));
+		buff = receive_msg(cfd);
+		printf("%s\n", buff);
+		ft_strdel(&buff);
 	}
 	else if (ft_strncmp(buff_input, "get", 3) == 0)
 	{
 		send_msg(buff_input, cfd);
 		receive_file(cfd, buff_input + 4);
 	}
-	else
+	else if (ft_strncmp(buff_input, "cd", 2) == 0)
 	{
 		send_msg(buff_input, cfd);
 		printf("%s\n", receive_msg(cfd));
+	}
+	else if (ft_strcmp(buff_input, "quit") == 0)
+		exit(0);
+	else
+	{
+		send_msg(buff_input, cfd);
+		buff = receive_msg(cfd);
+		printf("%s\n", buff);
+		ft_strdel(&buff);
 	}
 }
 
@@ -89,7 +99,7 @@ void		do_interaction(int cfd)
 
 	buff = 0;
 	ft_putstr("@>");
-	while ((ret = get_next_line(0, &buff)) >= 0)
+	while ((ret = get_next_line(0, &buff)) > 0)
 	{
 		if (ft_strlen(buff) == 0)
 		{
@@ -97,6 +107,7 @@ void		do_interaction(int cfd)
 			continue;
 		}
 		examine_input(buff, cfd);
+		ft_strdel(&buff);
 		ft_putstr("@>");
 	}
 	close(cfd);

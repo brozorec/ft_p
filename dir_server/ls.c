@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/07 15:52:44 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/09 16:29:28 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/13 14:29:45 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 void			read_dir_loop(DIR *dirp, int cfd)
 {
 	struct dirent		*entry;
+	char				cwd[4096];
 
 	while (1)
 	{
@@ -29,7 +30,12 @@ void			read_dir_loop(DIR *dirp, int cfd)
 		if (entry == 0 && errno == 0)
 			break ;
 	}
-	if (send(cfd, "SUCCESS\r\n", 9, MSG_DONTWAIT) == -1)
+	if (send(cfd, "SUCCESS\nThe content of ", 23, MSG_DONTWAIT) == -1)
+		err_msg("send() readdir failed.\n");
+	getcwd(cwd, 4095);
+	if (send(cfd, cwd, ft_strlen(cwd), MSG_DONTWAIT) == -1)
+		err_msg("send() readdir failed.\n");
+	if (send(cfd, " was listed.\r\n", 14, MSG_DONTWAIT) == -1)
 		err_msg("send() readdir failed.\n");
 }
 

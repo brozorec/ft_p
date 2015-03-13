@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/07 16:56:25 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/10 16:28:35 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/13 14:41:01 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ char		*take_env_var(void)
 	return (0);
 }
 
-void		print_cwd(void)
+char		*take_cwd(void)
 {
 	char		cwd[4096];
 	char		*path;
@@ -40,18 +40,20 @@ void		print_cwd(void)
 	{
 		ft_putstr(path);
 		ft_putstr("\n");
-		free(path);
 	}
 	else
 	{
 		getcwd(cwd, 4095);
 		ft_putstr(cwd);
 		ft_putstr("\n");
+		path = ft_strdup(cwd);
 	}
+	return (path);
 }
 
 void		do_pwd(char **tab, int cfd)
 {
+	char		*path;
 
 	if (tab[1] != 0)
 	{
@@ -59,7 +61,12 @@ void		do_pwd(char **tab, int cfd)
 			err_msg("send() pwd failed.\n");
 		return ;
 	}
-	print_cwd();
-	if (send(cfd, "SUCCESS\r\n", 9, MSG_DONTWAIT) == -1)
+	path = take_cwd();
+	if (send(cfd, "SUCCESS\nCurrent working directory of server is as follows:\n", 59, MSG_DONTWAIT) == -1)
 		err_msg("send() pwd failed.\n");
+	if (send(cfd, path, ft_strlen(path), MSG_DONTWAIT) == -1)
+		err_msg("send() pwd failed.\n");
+	if (send(cfd, "\r\n", 2, MSG_DONTWAIT) == -1)
+		err_msg("send() pwd failed.\n");
+	ft_strdel(&path);
 }

@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/09 12:40:32 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/12 13:23:14 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/13 16:17:29 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # include <arpa/inet.h>
 # include <signal.h>
 # include <sys/wait.h>
+# include <sys/stat.h>
 # include <dirent.h>
 # include <errno.h>
 # include <fcntl.h>

@@ -6,7 +6,7 @@
 #    By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2015/03/09 12:02:33 by bbarakov          #+#    #+#              #
-#    Updated: 2015/03/10 17:45:31 by bbarakov         ###   ########.fr        #
+#    Updated: 2015/03/13 14:30:03 by bbarakov         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -19,6 +19,7 @@ SRC1=		dir_server/server.c \
 			dir_server/get_next_line.c \
 			dir_server/ls.c \
 			dir_server/pwd.c \
+			dir_server/cd.c \
 			dir_server/send_file.c \
 			dir_server/errors.c \
 

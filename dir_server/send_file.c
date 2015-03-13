@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/07 17:18:19 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/12 17:31:26 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/13 17:37:16 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,24 +27,41 @@ char		*get_file_size(int fd_file)
 	return (size);
 }
 
-void		read_and_send(int cfd, int fd_file, int size_file)
+// void		read_and_send(int cfd, int fd_file)
+// {
+// 	int				ret;
+// 	char			buff[3];
+
+// 	while ((ret = read(fd_file, buff, 1)) >= 0)
+// 	{
+// 		buff[ret] = '\0';
+// 		if (ret == 0)
+// 		{
+// 			buff[ret] = '\r';
+// 			buff[ret + 1] = '\n';
+// 			buff[ret + 2] = '\0';
+// 		}
+// 		if (send(cfd, buff, ft_strlen(buff) + 1, MSG_DONTWAIT) == -1)
+// 			err_msg("send() open_and_send failed.\n");
+// 		if (ret == 0)
+// 			break ;
+// 	}
+// 	if (send(cfd, "SUCCESS\nFile sent.\r\n", 20, MSG_DONTWAIT) == -1)
+// 		err_msg("send() open_and_send failed.\n");
+// 	close(fd_file);
+// }
+
+void		read_and_send(int cfd, int fd_file, int size)
 {
 	int				ret;
-	char			buff[size_file + 3];
+	char			buff[size];
 
-	while ((ret = read(fd_file, buff, size_file)) > 0)
+	while ((ret = read(fd_file, buff, size)) > 0)
 	{
-		if (ret == size_file)
-		{
-			printf("%d\n", ret);
-			buff[ret] = '\r';
-			buff[ret + 1] = '\n';
-			// buff[ret + 2] = '\0';
-		}
-		if (send(cfd, buff, size_file + 2, MSG_DONTWAIT) == -1)
+		if (send(cfd, buff, size, MSG_DONTWAIT) == -1)
 			err_msg("send() open_and_send failed.\n");
 	}
-	if (send(cfd, "SUCCESS\r\n", 9, MSG_DONTWAIT) == -1)
+	if (send(cfd, "SUCCESS\nFile sent.\r\n", 20, MSG_DONTWAIT) == -1)
 		err_msg("send() open_and_send failed.\n");
 	close(fd_file);
 }
@@ -52,7 +69,8 @@ void		read_and_send(int cfd, int fd_file, int size_file)
 void		open_file(char *file, int cfd)
 {
 	int			fd_file;
-	char		*size_file;
+	char		*size;
+	int			sz;
 
 	if ((fd_file = open(file, O_RDWR)) == -1)
 	{
@@ -64,11 +82,13 @@ void		open_file(char *file, int cfd)
 	{
 		if (send(cfd, "OK\r\n", 4, MSG_DONTWAIT) == -1)
 			err_msg("send() open_file failed.\n");
-		size_file = get_file_size(fd_file);
-		if (send(cfd, size_file, ft_strlen(size_file), MSG_DONTWAIT) == -1)
+		size = get_file_size(fd_file);
+		if (send(cfd, size, ft_strlen(size), MSG_DONTWAIT) == -1)
 			err_msg("send() open_file failed.\n");
+		size[ft_strlen(size) - 2] = '\0';
+		sz = ft_atoi(size);
+		read_and_send(cfd, fd_file, sz);
 	}
-	read_and_send(cfd, fd_file, ft_atoi(size_file));
 }
 
 void		send_file(char **tab, int cfd)
