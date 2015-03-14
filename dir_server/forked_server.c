@@ -12,7 +12,7 @@
 
 #include "server.h"
 
-void		examine_buff(char *buff, int cfd, char *starting_dir)
+void		examine_buff(char *buff, int cfd, int *level_dir)
 {
 	char				**tab;
 
@@ -22,7 +22,7 @@ void		examine_buff(char *buff, int cfd, char *starting_dir)
 	else if (ft_strcmp(tab[0], "pwd") == 0)
 		do_pwd(tab, cfd);
 	else if (ft_strcmp(tab[0], "cd") == 0)
-		do_cd(tab, cfd, starting_dir);
+		*level_dir = do_cd(tab, cfd, *level_dir);
 	else if (ft_strcmp(tab[0], "get") == 0)
 		send_file(tab, cfd);
 	else if (ft_strcmp(buff, "quit") == 0)
@@ -43,17 +43,17 @@ void		examine_buff(char *buff, int cfd, char *starting_dir)
 void		forked_process(int cfd)
 {
 	char				buff[1024];
-	char				*starting_dir;
+	int					level_dir;
 	int 				ret;
 
-	starting_dir = take_cwd();
+	level_dir = 0;
 	while ((ret = recv(cfd, buff, 1023, 0)) > 0)
 	{
 		// dump(buff, ret);
 		buff[ret] = '\0';
 		if (ft_strlen(buff) == 0)
 			continue ;
-		examine_buff(buff, cfd, starting_dir);
+		examine_buff(buff, cfd, &level_dir);
 	}
 	err_msg("Connection closed by client.\n");
 }

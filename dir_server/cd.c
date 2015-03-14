@@ -35,6 +35,7 @@ void		change_dir(char *dir, int cfd)
 {
 	extern char 	**environ;
 	char 			*dir_up;
+	char 			buff[1024];
 
 	dir_up = ft_str3join(take_env_var(), "/", dir);
 	if (chdir(dir_up) == -1)
@@ -43,6 +44,7 @@ void		change_dir(char *dir, int cfd)
 			err_msg("send() do_cd failed.\n");
 		return ;
 	}
+	dir_up = getcwd(buff, 1023);
 	change_env_var("PWD=", dir_up, &environ);
 	if (send(cfd, "SUCCESS\nCurrent working directory of server changed to:\n", 56, MSG_DONTWAIT) == -1)
 		err_msg("send() do_cd failed.\n");
@@ -52,14 +54,57 @@ void		change_dir(char *dir, int cfd)
 		err_msg("send() do_cd failed.\n");
 }
 
-void		do_cd(char **tab, int cfd, char *starting_dir)
+int			examine_path(char *path)
 {
+	int				i;
+	int				level;
+
+	i = 0;
+	level = 0;
+	while (path[i])
+	{
+		if (path[i] != '/' && path[i] != '.')
+		{
+			++level;
+			while (path[i] && path[i] != '/')
+				++i;
+			if (path[i] == '\0')
+				return (level);
+		}
+		else if (path[i] == '.' && path[i + 1] == '.')
+		{
+			++i;
+			--level;
+		}
+		++i;
+	}
+	return (level);
+}
+
+int			do_cd(char **tab, int cfd, int current_level)
+{
+	int				level;
+	int				new_level;
+
+	new_level = current_level;
 	if (tab[1] == 0 || tab[2] != 0)
 	{
 		if (send(cfd, "ERROR\nUsage cd: cd <path>\r\n", 27, MSG_DONTWAIT) == -1)
 			err_msg("send() do_cd failed.\n");
-		return ;
+		return (new_level);
 	}
-	if (ft_strcmp(tab[1], "..") != 0)
+	level = examine_path(tab[1]);
+	printf("%d\n", current_level);
+	printf("%d\n", level);
+	if ((current_level + level) >= 0)
+	{
 		change_dir(tab[1], cfd);
+		new_level = current_level + level;
+	}
+	else
+	{
+		if (send(cfd, "ERROR\nNot allowed to change to this directory.\r\n", 48, MSG_DONTWAIT) == -1)
+			err_msg("send() do_cd failed.\n");
+	}
+	return (new_level);
 }

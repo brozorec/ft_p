@@ -14,12 +14,11 @@
 
 void		sig_child(int sig)
 {
-	pid_t				child;
 	int 				status;
 
 	if (sig == 20)
 	{
-		child = wait4(0, &status, WUNTRACED, 0);
+		wait4(0, &status, WUNTRACED, 0);
 		return ;
 	}
 }
