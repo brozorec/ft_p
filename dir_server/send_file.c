@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/07 17:18:19 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/13 17:37:16 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/15 18:39:20 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,42 +27,25 @@ char		*get_file_size(int fd_file)
 	return (size);
 }
 
-// void		read_and_send(int cfd, int fd_file)
-// {
-// 	int				ret;
-// 	char			buff[3];
-
-// 	while ((ret = read(fd_file, buff, 1)) >= 0)
-// 	{
-// 		buff[ret] = '\0';
-// 		if (ret == 0)
-// 		{
-// 			buff[ret] = '\r';
-// 			buff[ret + 1] = '\n';
-// 			buff[ret + 2] = '\0';
-// 		}
-// 		if (send(cfd, buff, ft_strlen(buff) + 1, MSG_DONTWAIT) == -1)
-// 			err_msg("send() open_and_send failed.\n");
-// 		if (ret == 0)
-// 			break ;
-// 	}
-// 	if (send(cfd, "SUCCESS\nFile sent.\r\n", 20, MSG_DONTWAIT) == -1)
-// 		err_msg("send() open_and_send failed.\n");
-// 	close(fd_file);
-// }
-
 void		read_and_send(int cfd, int fd_file, int size)
 {
 	int				ret;
-	char			buff[size];
+	char			buff[2];
+	int				i;
 
-	while ((ret = read(fd_file, buff, size)) > 0)
+	i = 0;
+	while (i < size)
 	{
-		if (send(cfd, buff, size, MSG_DONTWAIT) == -1)
-			err_msg("send() open_and_send failed.\n");
+		if ((ret = read(fd_file, buff, 1)) > 0)
+		{
+			buff[1] = '\0';
+			i += ret;
+			if (send(cfd, buff, 1, 0) == -1)
+				err_msg("send() open_and_send failed.\n");
+		}
 	}
 	if (send(cfd, "SUCCESS\nFile sent.\r\n", 20, MSG_DONTWAIT) == -1)
-		err_msg("send() open_and_send failed.\n");
+				err_msg("send() open_and_send failed.\n");
 	close(fd_file);
 }
 
@@ -87,6 +70,7 @@ void		open_file(char *file, int cfd)
 			err_msg("send() open_file failed.\n");
 		size[ft_strlen(size) - 2] = '\0';
 		sz = ft_atoi(size);
+		printf("%d\n", sz);
 		read_and_send(cfd, fd_file, sz);
 	}
 }

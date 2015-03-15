@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/10 17:14:28 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/13 18:39:48 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/15 18:25:44 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,39 +57,25 @@ void		examine_input(char *buff_input, int cfd)
 {
 	char				*buff;
 
-	if (ft_strncmp(buff_input, "ls", 2) == 0)
-	{
-		send_msg(buff_input, cfd);
-		buff = receive_msg(cfd);
-		printf("%s\n", buff);
-		ft_strdel(&buff);
-	}
-	else if (ft_strncmp(buff_input, "pwd", 3) == 0)
-	{
-		send_msg(buff_input, cfd);
-		buff = receive_msg(cfd);
-		printf("%s\n", buff);
-		ft_strdel(&buff);
-	}
-	else if (ft_strncmp(buff_input, "get", 3) == 0)
+	if (ft_strncmp(buff_input, "get", 3) == 0)
 	{
 		send_msg(buff_input, cfd);
 		receive_file(cfd, buff_input + 4);
 	}
-	else if (ft_strncmp(buff_input, "cd", 2) == 0)
+	else if (ft_strncmp(buff_input, "put", 3) == 0)
 	{
 		send_msg(buff_input, cfd);
-		printf("%s\n", receive_msg(cfd));
+		receive_file(cfd, buff_input + 4);
 	}
-	else if (ft_strcmp(buff_input, "quit") == 0)
-		exit(0);
 	else
 	{
 		send_msg(buff_input, cfd);
 		buff = receive_msg(cfd);
-		printf("%s\n", buff);
+		ft_putendl(buff);
 		ft_strdel(&buff);
 	}
+	if (ft_strcmp(buff_input, "quit") == 0)
+		exit(0);
 }
 
 void		do_interaction(int cfd)

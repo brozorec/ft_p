@@ -31,21 +31,27 @@ char		*take_env_var(void)
 	return (0);
 }
 
-char		*take_cwd(void)
+char		*take_cwd(int flag_print)
 {
 	char		cwd[4096];
 	char		*path;
 
 	if ((path = take_env_var()) != 0)
 	{
-		ft_putstr(path);
-		ft_putstr("\n");
+		if (flag_print == 1)
+		{
+			ft_putstr(path);
+			ft_putstr("\n");
+		}
 	}
 	else
 	{
 		getcwd(cwd, 4095);
-		ft_putstr(cwd);
-		ft_putstr("\n");
+		if (flag_print == 1)
+		{
+			ft_putstr(cwd);
+			ft_putstr("\n");
+		}
 		path = ft_strdup(cwd);
 	}
 	return (path);
@@ -61,7 +67,7 @@ void		do_pwd(char **tab, int cfd)
 			err_msg("send() pwd failed.\n");
 		return ;
 	}
-	path = take_cwd();
+	path = take_cwd(1);
 	if (send(cfd, "SUCCESS\nCurrent working directory of server is as follows:\n", 59, MSG_DONTWAIT) == -1)
 		err_msg("send() pwd failed.\n");
 	if (send(cfd, path, ft_strlen(path), MSG_DONTWAIT) == -1)

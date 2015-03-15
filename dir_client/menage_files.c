@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/10 17:12:43 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/13 17:37:03 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/15 18:31:19 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,18 +35,26 @@
 void			get_content_file(int cfd, char *name_file, int size)
 {
 	char			*buff;
-	char			buff_file[size];
+	char			buff_file[2];
 	int				fd_file;
 	int				ret;
+	int				i;
 
+	i = 0;
 	if ((fd_file = open(name_file, O_TRUNC | O_CREAT | O_RDWR, ACCESSPERMS)) == -1)
 		err_msg("open() get_content_file failed.\n");
-	if ((ret = recv(cfd, buff_file, size, 0)) != 0)
+	while (i < size)
 	{
-		if ((ret = write(fd_file, buff_file, size)) == -1 )
-			err_msg("write() get_content_file failed.\n");
-		close(fd_file);
+		if ((ret = recv(cfd, buff_file, 1, 0)) != 0)
+		{
+			buff_file[1] = '\0';
+			i += ret;
+			if (write(fd_file, buff_file, 1) == -1 )
+				err_msg("write() get_content_file failed.\n");
+		}
+
 	}
+	close(fd_file);
 	buff = receive_msg(cfd);
 	ft_putendl(buff);
 	ft_strdel(&buff);

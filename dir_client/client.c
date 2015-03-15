@@ -6,11 +6,17 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/09 12:39:43 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/10 17:14:59 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/15 18:14:30 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "client.h"
+
+void		sig_pipe(int sig)
+{
+	if (sig == 13)
+		exit(0);
+}
 
 int			create_socket(char *addr, int port)
 {
@@ -36,6 +42,7 @@ int			main(int ac, char **av)
 	int					cfd;
 	int					port;
 
+	signal(SIGPIPE, sig_pipe);
 	if (ac != 3)
 		usage(av[0]);			// av[1] = hostaddr
 	if ((port = ft_atoi(av[2])) == 0)

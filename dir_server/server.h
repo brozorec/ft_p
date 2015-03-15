@@ -34,10 +34,10 @@ void		err_msg(char *err);
 void		usage(char *str);
 int 		get_next_line(int fd, char **line);
 void		do_ls(char **tab, int cfd);
-int 		do_cd(char **tab, int cfd, int current_level);
+void		do_cd(char **tab, int cfd, char *dir_base);
 char		*take_env_var(void);
 void		do_pwd(char **tab, int cfd);
-char		*take_cwd(void);
+char		*take_cwd(int flag_print);
 void		send_file(char **tab, int cfd);
 void		forked_process(int cfd);
 
