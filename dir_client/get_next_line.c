@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/11/16 16:52:40 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/09 14:50:10 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/16 16:41:23 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,18 +127,18 @@ int
 	if ((old = check_old(fd, line, old, 0)) == 0)
 		return (-1);
 	if (search_new_line(fd, line, &old, tmp) != 0)
-		return (ft_strlen(*line));
+		return (1);
 	while ((ret = read(fd, buf, BUFF_SIZE)) > 0)
 	{
 		buf[ret] = '\0';
 		*line = ft_strcat(*line, buf);
 		if (search_new_line(fd, line, &old, tmp) != 0)
-			return (ft_strlen(*line));
+			return (1);
 	}
 	free_and_move(fd, &old, tmp, 0);
 	if (ret < 0)
 		return (-1);
 	if (ft_strlen(*line) != 0)
-		return (ft_strlen(*line));
+		return (1);
 	return (0);
 }

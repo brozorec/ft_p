@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/13 14:14:57 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/15 16:09:14 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/16 15:46:21 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,15 +31,8 @@ void		change_env_var(char *var, char *value, char ***env)
 	}
 }
 
-char 		*resolve_path(char *path)
+char		*resolve_path_loop(char *path, char *new_path, int i, int j)
 {
-	char 			*new_path;
-	int 			i;
-	int				j;
-
-	i = 0;
-	j = 0;
-	new_path = ft_strnew(ft_strlen(path));
 	while (path[i])
 	{
 		if (path[i] == '.' && path[i + 1] != '.' && j-- > 0)
@@ -60,6 +53,19 @@ char 		*resolve_path(char *path)
 		++j;
 		++i;
 	}
+	return (new_path);
+}
+
+char 		*resolve_path(char *path)
+{
+	char 			*new_path;
+	int				i;
+	int				j;
+
+	i = 0;
+	j = 0;
+	new_path = ft_strnew(ft_strlen(path));
+	new_path = resolve_path_loop(path, new_path, i, j);
 	ft_strdel(&path);
 	return (new_path);
 }
@@ -70,17 +76,18 @@ void		change_dir(char *dir, int cfd)
 
 	if (chdir(dir) == -1)
 	{
-		if (send(cfd, "ERROR\nNo such directory.\r\n", 26, MSG_DONTWAIT) == -1)
-			err_msg("send() do_cd failed.\n");
+		send_msg("ERROR\nNo such directory.", cfd);
 		return ;
 	}
 	change_env_var("PWD=", dir, &environ);
-	if (send(cfd, "SUCCESS\nCurrent working directory of server changed to:\n", 56, MSG_DONTWAIT) == -1)
-		err_msg("send() do_cd failed.\n");
-	if (send(cfd, dir, ft_strlen(dir), MSG_DONTWAIT) == -1)
-		err_msg("send() do_cd failed.\n");
-	if (send(cfd, "\r\n", 2, MSG_DONTWAIT) == -1)
-		err_msg("send() do_cd failed.\n");
+	if (send(cfd, "SUCCESS\nCurrent working ", 24, 0) == -1)
+		fatal("Connection closed by client.\n");
+	if (send(cfd, "directory of server changed to:\n", 32, 0) == -1)
+		fatal("Connection closed by client.\n");
+	if (send(cfd, dir, ft_strlen(dir), 0) == -1)
+		fatal("Connection closed by client.\n");
+	if (send(cfd, "\r\n", 2, 0) == -1)
+		fatal("Connection closed by client.\n");
 }
 
 void		do_cd(char **tab, int cfd, char *dir_base)
@@ -91,8 +98,8 @@ void		do_cd(char **tab, int cfd, char *dir_base)
 
 	if (tab[1] == 0 || tab[2] != 0)
 	{
-		if (send(cfd, "ERROR\nUsage cd: cd <path>\r\n", 27, MSG_DONTWAIT) == -1)
-			err_msg("send() do_cd failed.\n");
+		send_msg("ERROR\nUsage cd: cd <path>", cfd);
+		return ;
 	}
 	len = ft_strlen(tab[1]) - 1;
 	if (tab[1][len] == '/')
@@ -101,14 +108,12 @@ void		do_cd(char **tab, int cfd, char *dir_base)
 	new_dir = resolve_path(ft_str3join(current_dir, "/", tab[1]));
 	ft_strdel(&current_dir);
 	len = ft_strlen(dir_base);
-	if (ft_strncmp(dir_base, new_dir, len) == 0 && (new_dir[len] == '\0' || new_dir[len] == '/'))
+	if (ft_strncmp(dir_base, new_dir, len) == 0 && (new_dir[len] == '\0' ||
+		new_dir[len] == '/'))
 	{
 		change_dir(new_dir, cfd);
 	}
 	else
-	{
-		if (send(cfd, "ERROR\nNot allowed to change to this directory.\r\n", 48, MSG_DONTWAIT) == -1)
-			err_msg("send() do_cd failed.\n");
-	}
+		send_msg("ERROR\nNot allowed to change to this directory.", cfd);
 	ft_strdel(&new_dir);
 }

@@ -6,11 +6,68 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/07 18:10:25 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/15 16:10:45 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/16 19:32:36 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.h"
+
+int			send_msg(char *buff, int cfd)
+{
+	int 				i;
+
+	i = 0;
+	while (buff[i])
+	{
+		if (send(cfd, &buff[i], 1, MSG_DONTWAIT) == -1)
+			return (0);
+		++i;
+	}
+	if (send(cfd, "\r\n", 2, MSG_DONTWAIT) == -1)
+		return (0);
+	return (1);
+}
+
+char		*check_for_match(char *buff_recv, char *msg, int *matched)
+{
+	if (buff_recv[0] == '\r')
+		++(*matched);
+	else if ((*matched) == 1)
+	{
+		if (buff_recv[0] == '\n')
+		{
+			msg[ft_strlen(msg) - 1] = '\0';
+			return (msg);
+		}
+		else
+			(*matched) = 0;
+	}
+	return (0);
+}
+
+char		*receive_msg(int cfd)
+{
+	int 				matched;
+	char				buff_recv[2];
+	char				*msg;
+	char				*save;
+
+	msg = 0;
+	matched = 0;
+	while (recv(cfd, &buff_recv[0], 1, 0) > 0)
+	{
+		buff_recv[1] = '\0';
+		if ((save = check_for_match(buff_recv, msg, &matched)) != 0)
+			return (save);
+		save = ft_strdup(msg);
+		free(msg);
+		msg = ft_strjoin(save, buff_recv);
+		free(save);
+	}
+	if (msg == 0)
+		msg = ft_strdup("Connection was closed by client.");;
+	return (msg);
+}
 
 void		examine_buff(char *buff, int cfd, char *dir_base)
 {
@@ -25,34 +82,35 @@ void		examine_buff(char *buff, int cfd, char *dir_base)
 		do_cd(tab, cfd, dir_base);
 	else if (ft_strcmp(tab[0], "get") == 0)
 		send_file(tab, cfd);
+	else if (ft_strcmp(tab[0], "put") == 0)
+		receive_file(tab[1], cfd);
 	else if (ft_strcmp(buff, "quit") == 0)
 	{
-		if (send(cfd, "SUCCESS\nConnection closed.\r\n", 28, MSG_DONTWAIT) == -1)
-			err_msg("send() examine_buff failed.\n");
+		send_msg("SUCCESS\nConnection closed.", cfd);
 		close(cfd);
+		ft_strdel(&dir_base);
+		free_tab(tab);
 		exit(0);
 	}
 	else
-	{
-		if (send(cfd, "ERROR\nCommand line.\r\n", 21, MSG_DONTWAIT) == -1)
-			err_msg("send() examine_buff failed.\n");
-	}
-	free(tab);
+		send_msg("ERROR\nCommand line.", cfd);
+	free_tab(tab);
 }
 
 void		forked_process(int cfd)
 {
-	char				buff[1024];
+	char				*buff;
 	char				*dir_base;
-	int 				ret;
 
 	dir_base = take_cwd(0);
-	while ((ret = recv(cfd, buff, 1023, 0)) > 0)
+	while ((buff = receive_msg(cfd)) != 0)
 	{
-		buff[ret] = '\0';
 		if (ft_strlen(buff) == 0)
 			continue ;
 		examine_buff(buff, cfd, dir_base);
+		ft_strdel(&buff);
 	}
-	err_msg("Connection closed by client.\n");
+	ft_strdel(&dir_base);
+	fatal("Connection closed by client.\n");
+	close(cfd);
 }

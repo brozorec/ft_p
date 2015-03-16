@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/07 16:56:25 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/13 14:41:01 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/16 19:20:01 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,16 +63,17 @@ void		do_pwd(char **tab, int cfd)
 
 	if (tab[1] != 0)
 	{
-		if (send(cfd, "ERROR\nUsage pwd: pwd <no options>\r\n", 35, MSG_DONTWAIT) == -1)
-			err_msg("send() pwd failed.\n");
+		send_msg("ERROR\nUsage pwd: pwd <no options>", cfd);
 		return ;
 	}
 	path = take_cwd(1);
-	if (send(cfd, "SUCCESS\nCurrent working directory of server is as follows:\n", 59, MSG_DONTWAIT) == -1)
-		err_msg("send() pwd failed.\n");
-	if (send(cfd, path, ft_strlen(path), MSG_DONTWAIT) == -1)
-		err_msg("send() pwd failed.\n");
-	if (send(cfd, "\r\n", 2, MSG_DONTWAIT) == -1)
-		err_msg("send() pwd failed.\n");
+	if (send(cfd, "SUCCESS\nCurrent working ", 24, 0) == -1)
+		fatal("Connection closed by client.\n");
+	if (send(cfd, "directory of server is as follows:\n", 35, 0) == -1)
+		fatal("Connection closed by client.\n");
+	if (send(cfd, path, ft_strlen(path), 0) == -1)
+		fatal("Connection closed by client.\n");
+	if (send(cfd, "\r\n", 2, 0) == -1)
+		fatal("Connection closed by client.\n");
 	ft_strdel(&path);
 }

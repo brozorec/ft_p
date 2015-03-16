@@ -23,6 +23,15 @@ void		sig_child(int sig)
 	}
 }
 
+void		sig_pipe(int sig)
+{
+	if (sig == 13)
+	{
+		fatal("Connection was closed by client.\n");
+		return ;
+	}
+}
+
 int			create_socket(int port)
 {
 	int					sfd;
@@ -30,17 +39,17 @@ int			create_socket(int port)
 	struct sockaddr_in	host_addr;
 
 	if ((proto = getprotobyname("tcp")) == 0)
-		err_msg("getprotobyname() failed.\n");
+		fatal("getprotobyname() failed.\n");
 	if ((sfd = socket(PF_INET, SOCK_STREAM, proto->p_proto)) == -1)
-		err_msg("socket() failed.\n");
+		fatal("socket() failed.\n");
 	host_addr.sin_family = AF_INET;
 	host_addr.sin_port = htons(port);
 	host_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	ft_memset(&(host_addr.sin_zero), '\0', 8);
 	if (bind(sfd, (const struct sockaddr *)&host_addr, sizeof(host_addr)) == -1)
-		err_msg("bind() failed.\n");
+		fatal("bind() failed.\n");
 	if (listen(sfd, 10) == -1)
-		err_msg("listen() failed.\n");
+		fatal("listen() failed.\n");
 	return (sfd);
 }
 
@@ -55,7 +64,7 @@ void		accept_connections(int sfd)
 	while (1)
 	{
 		if ((cfd = accept(sfd, (struct sockaddr *)&client_addr, &client_addr_size)) == -1)
-			err_msg("accept() failed.\n");
+			fatal("accept() failed.\n");
 		if ((child = fork()) == 0)
 		{
 			close(sfd);
@@ -72,10 +81,11 @@ int			main(int ac, char **av)
 	int				port;
 
 	if (ac != 2)
-		usage(av[0]);
+		fatal("Usage: serveur <port>\n");
 	if ((port = ft_atoi(av[1])) == 0  || port < 1025)
-		err_msg("Enter valid port.\n");
+		fatal("Enter valid port.\n");
 	signal(SIGCHLD, sig_child);
+	signal(SIGPIPE, sig_pipe);
 	sfd = create_socket(port);
 	accept_connections(sfd);
 	close(sfd);

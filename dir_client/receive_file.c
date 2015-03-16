@@ -1,58 +1,45 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   menage_files.c                                     :+:      :+:    :+:   */
+/*   receive_file.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/10 17:12:43 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/15 18:31:19 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/16 18:42:20 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "client.h"
 
-// void			get_content_file(int cfd, char *name_file)
-// {
-// 	char			*buff;
-// 	int				fd_file;
-// 	int				ret;
+void			fill_content_file(char *buff_file, int fd_file, int *i)
+{
+	buff_file[1] = '\0';
+	++(*i);
+	if (write(fd_file, buff_file, 1) == -1)
+		err_msg("write() failed.\n");
+}
 
-// 	if ((fd_file = open(name_file, O_TRUNC | O_CREAT | O_RDWR, S_IRWXU)) == -1)  // ACCESSPERMS
-// 		err_msg("open() get_content_file failed.\n");
-// 	if ((buff = receive_msg(cfd)) != 0)
-// 	{
-// 		if ((ret = write(fd_file, buff, ft_strlen(buff))) == -1 )
-// 			err_msg("write() get_content_file failed.\n");
-// 		close(fd_file);
-// 		ft_strdel(&buff);
-// 	}
-// 	buff = receive_msg(cfd);
-// 	ft_putendl(buff);
-// 	ft_strdel(&buff);
-// }
-
-void			get_content_file(int cfd, char *name_file, int size)
+void			get_content_file(int cfd, char *name, int size)
 {
 	char			*buff;
 	char			buff_file[2];
 	int				fd_file;
-	int				ret;
 	int				i;
 
 	i = 0;
-	if ((fd_file = open(name_file, O_TRUNC | O_CREAT | O_RDWR, ACCESSPERMS)) == -1)
-		err_msg("open() get_content_file failed.\n");
+	if ((fd_file = open(name, O_TRUNC | O_CREAT | O_RDWR, ACCESSPERMS)) == -1)
+		err_msg("open() failed.\n");
 	while (i < size)
 	{
-		if ((ret = recv(cfd, buff_file, 1, 0)) != 0)
+		if (recv(cfd, buff_file, 1, 0) > 0)
+			fill_content_file(buff_file, fd_file, &i);
+		else
 		{
-			buff_file[1] = '\0';
-			i += ret;
-			if (write(fd_file, buff_file, 1) == -1 )
-				err_msg("write() get_content_file failed.\n");
+			err_msg("Connection closed unexpectedly.\n");
+			close(fd_file);
+			return ;
 		}
-
 	}
 	close(fd_file);
 	buff = receive_msg(cfd);
@@ -72,6 +59,7 @@ void			receive_file(int cfd, char *file)
 		ft_strdel(&buff);
 		buff = receive_msg(cfd);
 		size = ft_atoi(buff);
+		ft_strdel(&buff);
 		if ((name = ft_strrchr(file, '/')) != 0)
 			get_content_file(cfd, name + 1, size);
 		else

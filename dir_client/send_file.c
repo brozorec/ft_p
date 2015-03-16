@@ -6,11 +6,11 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/07 17:18:19 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/16 16:00:13 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/16 17:04:06 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "server.h"
+#include "client.h"
 
 char		*get_file_size(int fd_file)
 {
@@ -27,16 +27,17 @@ char		*get_file_size(int fd_file)
 
 void		read_and_send(int cfd, int fd_file, int size)
 {
+	int				ret;
 	char			buff[2];
 	int				i;
 
 	i = 0;
 	while (i < size)
 	{
-		if (read(fd_file, buff, 1) > 0)
+		if ((ret = read(fd_file, buff, 1)) > 0)
 		{
 			buff[1] = '\0';
-			++i;
+			i += ret;
 			if (send(cfd, buff, 1, 0) == -1)
 			{
 				close(fd_file);
@@ -44,11 +45,11 @@ void		read_and_send(int cfd, int fd_file, int size)
 			}
 		}
 	}
-	send_msg("SUCCESS\nFile received.", cfd);
+	ft_putstr("SUCCESS\nFile sent.\n");
 	close(fd_file);
 }
 
-void		open_file(char *file, int cfd)
+void		open_file(char *file, char *buff_input, int cfd)
 {
 	int			fd_file;
 	char		*size;
@@ -56,11 +57,13 @@ void		open_file(char *file, int cfd)
 
 	if ((fd_file = open(file, O_RDWR)) == -1)
 	{
-		send_msg("ERROR\nNo such file.", cfd);
+		ft_putstr_fd("ERROR\nNo such file.\n", 2);
 		return ;
 	}
 	else
 	{
+		if (send_msg(buff_input, cfd) == 0)
+			return ;
 		send_msg("OK", cfd);
 		size = get_file_size(fd_file);
 		send_msg(size, cfd);
@@ -70,12 +73,20 @@ void		open_file(char *file, int cfd)
 	}
 }
 
-void		send_file(char **tab, int cfd)
+void		send_file(int cfd, char *buff_input)
 {
+	char		**tab;
+	int			i;
+
+	tab = ft_strsplit(buff_input, ' ');
 	if (tab[1] == 0 || tab[2] != 0)
+		ft_putstr_fd("ERROR\nUsage put: put <file>\n", 2);
+	else
+		open_file(tab[1], buff_input, cfd);
+	i = 0;
+	while (tab && tab[i])
 	{
-		send_msg("ERROR\nUsage get: get <file>", cfd);
-		return ;
+		free(tab[i]);
+		++i;
 	}
-	open_file(tab[1], cfd);
 }
