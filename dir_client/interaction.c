@@ -65,7 +65,7 @@ char		*receive_msg(int cfd)
 		free(save);
 	}
 	if (msg == 0)
-		msg = ft_strdup("Connection was closed by server.");
+		msg = ft_strdup("Connection closed by server.");
 	return (msg);
 }
 

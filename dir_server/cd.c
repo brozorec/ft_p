@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/13 14:14:57 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/16 15:46:21 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/17 17:30:07 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,9 @@ char		*resolve_path_loop(char *path, char *new_path, int i, int j)
 	return (new_path);
 }
 
-char 		*resolve_path(char *path)
+char		*resolve_path(char *path)
 {
-	char 			*new_path;
+	char			*new_path;
 	int				i;
 	int				j;
 
@@ -72,7 +72,7 @@ char 		*resolve_path(char *path)
 
 void		change_dir(char *dir, int cfd)
 {
-	extern char 	**environ;
+	extern char		**environ;
 
 	if (chdir(dir) == -1)
 	{
@@ -92,8 +92,8 @@ void		change_dir(char *dir, int cfd)
 
 void		do_cd(char **tab, int cfd, char *dir_base)
 {
-	char 				*new_dir;
-	char 				*current_dir;
+	char				*new_dir;
+	char				*current_dir;
 	int					len;
 
 	if (tab[1] == 0 || tab[2] != 0)

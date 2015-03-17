@@ -84,9 +84,5 @@ void		send_file(int cfd, char *buff_input)
 	else
 		open_file(tab[1], buff_input, cfd);
 	i = 0;
-	while (tab && tab[i])
-	{
-		free(tab[i]);
-		++i;
-	}
+	ft_str3del(tab);
 }

@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/04 18:23:42 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/16 19:30:51 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/17 17:29:46 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,9 @@
 # include <sys/mman.h>
 # include <sys/stat.h>
 # include "../libft/includes/libft.h"
-# include "get_next_line.h"
 
 void		fatal(char *err);
 void		usage(char *str);
-int 		get_next_line(int fd, char **line);
 void		do_ls(char **tab, int cfd);
 void		do_cd(char **tab, int cfd, char *dir_base);
 char		*take_env_var(void);
@@ -43,6 +41,5 @@ int			send_msg(char *buff, int cfd);
 void		send_file(char **tab, int cfd);
 void		receive_file(char *file, int cfd);
 void		forked_process(int cfd);
-void		free_tab(char **tab);
 
 #endif

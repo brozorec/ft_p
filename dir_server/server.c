@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/04 18:23:03 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/13 14:48:06 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/17 17:29:34 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void		sig_child(int sig)
 {
-	int 				status;
+	int				status;
 
 	if (sig == 20)
 	{
@@ -27,27 +27,29 @@ void		sig_pipe(int sig)
 {
 	if (sig == 13)
 	{
-		fatal("Connection was closed by client.\n");
+		fatal("Connection closed by client.\n");
 		return ;
 	}
 }
 
-int			create_socket(int port)
+int			create_socket(char *port)
 {
 	int					sfd;
-	struct protoent		*proto;
-	struct sockaddr_in	host_addr;
+	int					yes;
+	struct addrinfo		hints;
+	struct addrinfo		*res;
 
-	if ((proto = getprotobyname("tcp")) == 0)
-		fatal("getprotobyname() failed.\n");
-	if ((sfd = socket(PF_INET, SOCK_STREAM, proto->p_proto)) == -1)
+	ft_memset(&hints, 0, sizeof(hints));
+	hints.ai_family = PF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+	if (getaddrinfo(0, port, &hints, &res) != 0)
+		fatal("Connection failed.\n");
+	if ((sfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0)
 		fatal("socket() failed.\n");
-	host_addr.sin_family = AF_INET;
-	host_addr.sin_port = htons(port);
-	host_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	ft_memset(&(host_addr.sin_zero), '\0', 8);
-	if (bind(sfd, (const struct sockaddr *)&host_addr, sizeof(host_addr)) == -1)
-		fatal("bind() failed.\n");
+	if (setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1)
+		fatal("setsockopt() failed.\n");
+	if (bind(sfd, res->ai_addr, res->ai_addrlen) < 0)
+		fatal("Connection failed. Probably port is not valid.\n");
 	if (listen(sfd, 10) == -1)
 		fatal("listen() failed.\n");
 	return (sfd);
@@ -56,21 +58,21 @@ int			create_socket(int port)
 void		accept_connections(int sfd)
 {
 	int					cfd;
-	struct sockaddr_in	client_addr;
-	socklen_t			client_addr_size;
+	struct sockaddr_in	clnt_addr;
+	socklen_t			add_size;
 	pid_t				child;
 
-	client_addr_size = sizeof(client_addr);
+	add_size = sizeof(clnt_addr);
 	while (1)
 	{
-		if ((cfd = accept(sfd, (struct sockaddr *)&client_addr, &client_addr_size)) == -1)
+		if ((cfd = accept(sfd, (struct sockaddr *)&clnt_addr, &add_size)) == -1)
 			fatal("accept() failed.\n");
 		if ((child = fork()) == 0)
 		{
 			close(sfd);
 			forked_process(cfd);
 		}
-		printf("%s\n", "New client");
+		ft_putendl("New client");
 		close(cfd);
 	}
 }
@@ -78,15 +80,12 @@ void		accept_connections(int sfd)
 int			main(int ac, char **av)
 {
 	int				sfd;
-	int				port;
 
 	if (ac != 2)
 		fatal("Usage: serveur <port>\n");
-	if ((port = ft_atoi(av[1])) == 0  || port < 1025)
-		fatal("Enter valid port.\n");
 	signal(SIGCHLD, sig_child);
 	signal(SIGPIPE, sig_pipe);
-	sfd = create_socket(port);
+	sfd = create_socket(av[1]);
 	accept_connections(sfd);
 	close(sfd);
 	return (0);

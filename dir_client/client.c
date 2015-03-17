@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/09 12:39:43 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/16 18:16:42 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/17 17:31:16 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,26 +16,25 @@ void		sig_pipe(int sig)
 {
 	if (sig == 13)
 	{
-		err_msg("Connection was closed by server.\n");
+		err_msg("Connection closed by server.\n");
 		return ;
 	}
 }
 
-int			create_socket(char *addr, int port)
+int			create_socket(char *host_name, char *port)
 {
 	int					cfd;
-	struct protoent		*proto;
-	struct sockaddr_in	clnt_addr;
+	struct addrinfo		hints;
+	struct addrinfo		*res;
 
-	if ((proto = getprotobyname("tcp")) == 0)
-		err_msg("getprotobyname() failed.\n");
-	if ((cfd = socket(PF_INET, SOCK_STREAM, proto->p_proto)) == -1)
+	ft_memset(&hints, 0, sizeof(hints));
+	hints.ai_family = PF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+	if (getaddrinfo(host_name, port, &hints, &res) != 0)
+		fatal("Connection failed.\n");
+	if ((cfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0)
 		err_msg("socket() failed.\n");
-	clnt_addr.sin_family = AF_INET;
-	clnt_addr.sin_port = htons(port);
-	clnt_addr.sin_addr.s_addr = inet_addr(addr);
-	ft_memset(&(clnt_addr.sin_zero), '\0', 8);
-	if (connect(cfd, (struct sockaddr *)&clnt_addr, sizeof(clnt_addr)) == -1)
+	if (connect(cfd, res->ai_addr, res->ai_addrlen) < 0)
 		fatal("Connection failed.\n");
 	return (cfd);
 }
@@ -43,14 +42,11 @@ int			create_socket(char *addr, int port)
 int			main(int ac, char **av)
 {
 	int					cfd;
-	int					port;
 
 	signal(SIGPIPE, sig_pipe);
 	if (ac != 3)
-		fatal("Usage: client <addr> <port>\n");	// av[1] = hostaddr
-	if ((port = ft_atoi(av[2])) == 0)
-		fatal("Enter valid port.\n");
-	cfd = create_socket(av[1], port);
+		fatal("Usage: client <addr> <port>\n");
+	cfd = create_socket(av[1], av[2]);
 	do_interaction(cfd);
 	return (0);
 }

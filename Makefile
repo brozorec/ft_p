@@ -6,7 +6,7 @@
 #    By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2015/03/09 12:02:33 by bbarakov          #+#    #+#              #
-#    Updated: 2015/03/13 14:30:03 by bbarakov         ###   ########.fr        #
+#    Updated: 2015/03/17 17:26:41 by bbarakov         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,10 +16,10 @@ CFLAGS=		-Wall -Werror -Wextra
 
 SRC1=		dir_server/server.c \
 			dir_server/forked_server.c \
-			dir_server/get_next_line.c \
 			dir_server/ls.c \
 			dir_server/pwd.c \
 			dir_server/cd.c \
+			dir_server/receive_file.c \
 			dir_server/send_file.c \
 			dir_server/errors.c \
 
@@ -31,7 +31,8 @@ SRC2=		dir_client/client.c \
 			dir_client/errors.c \
 			dir_client/get_next_line.c \
 			dir_client/interaction.c \
-			dir_client/menage_files.c \
+			dir_client/receive_file.c \
+			dir_client/send_file.c \
 
 OBJ2=		$(SRC2:.c=.o)
 
@@ -59,7 +60,7 @@ clean:
 	@make clean -C ./libft
 	@rm -rf $(OBJ1) $(OBJ2)
 
-flean: clean
+fclean: clean
 	@make fclean -C ./libft
 	@rm -rf serveur client
 
