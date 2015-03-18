@@ -6,7 +6,7 @@
 #    By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2015/03/09 12:02:33 by bbarakov          #+#    #+#              #
-#    Updated: 2015/03/17 17:26:41 by bbarakov         ###   ########.fr        #
+#    Updated: 2015/03/17 18:18:33 by bbarakov         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,16 +40,15 @@ INCL2=		./dir_client
 
 LIB=		./libft -lft
 
-all:		lib serveur client
+all:		serveur client
 
 serveur:	$(OBJ1)
+	@make -C ./libft
 	@$(CC) $(CFLAGS) -o $@ $^ -I $(INCL1) -L $(LIB)
 
 client:		$(OBJ2)
-	@$(CC) $(CFLAGS) -o $@ $^ -I $(INCL2) -L $(LIB)
-
-lib:
 	@make -C ./libft
+	@$(CC) $(CFLAGS) -o $@ $^ -I $(INCL2) -L $(LIB)
 
 %.o:	%.c
 	@$(CC) $(CFLAGS) -o $@ -c $^

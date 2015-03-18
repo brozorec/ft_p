@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/09 12:39:43 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/17 17:31:16 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/17 18:38:59 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,10 @@ int			create_socket(char *host_name, char *port)
 	struct addrinfo		*res;
 
 	ft_memset(&hints, 0, sizeof(hints));
-	hints.ai_family = PF_INET;
+	hints.ai_family = PF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+	hints.ai_flags = AI_PASSIVE | AI_ALL | AI_V4MAPPED;
 	if (getaddrinfo(host_name, port, &hints, &res) != 0)
 		fatal("Connection failed.\n");
 	if ((cfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0)
