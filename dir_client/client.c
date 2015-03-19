@@ -25,18 +25,20 @@ int			create_socket(char *host_name, char *port)
 {
 	int					cfd;
 	int 				i;
-	struct addrinfo		hints;
+	// struct addrinfo		hints;
 	struct addrinfo		*r;
 
-	ft_memset(&hints, 0, sizeof(hints));
-	hints.ai_family = PF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_protocol = IPPROTO_TCP;
-	hints.ai_flags = AI_ALL | AI_V4MAPPED;
-	if (getaddrinfo(host_name, port, &hints, &r) != 0)
+	// ft_memset(&hints, 0, sizeof(hints));
+	// hints.ai_family = AF_INET6;
+	// hints.ai_socktype = SOCK_STREAM;
+	// hints.ai_protocol = IPPROTO_TCP;
+	// hints.ai_flags = AI_ALL | AI_V4MAPPED;
+	if (getaddrinfo(host_name, port, 0, &r) != 0)
 		fatal("Connection failed.\n");
 	while (r)
 	{
+		printf("%s\n", "tuk");
+		printf("%i\n", r->ai_family);
 		if ((cfd = socket(r->ai_family, r->ai_socktype, r->ai_protocol)) < 0)
 		{
 			ft_putstr_fd("socket()\n", 2);

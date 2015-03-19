@@ -6,7 +6,7 @@
 /*   By: bbarakov <bbarakov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/07 18:10:25 by bbarakov          #+#    #+#             */
-/*   Updated: 2015/03/17 13:57:28 by bbarakov         ###   ########.fr       */
+/*   Updated: 2015/03/16 19:32:36 by bbarakov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int			send_msg(char *buff, int cfd)
 {
-	int					i;
+	int 				i;
 
 	i = 0;
 	while (buff[i])
@@ -47,7 +47,7 @@ char		*check_for_match(char *buff_recv, char *msg, int *matched)
 
 char		*receive_msg(int cfd)
 {
-	int					matched;
+	int 				matched;
 	char				buff_recv[2];
 	char				*msg;
 	char				*save;
@@ -65,7 +65,7 @@ char		*receive_msg(int cfd)
 		free(save);
 	}
 	if (msg == 0)
-		msg = ft_strdup("Connection closed by client.");
+		msg = ft_strdup("Connection was closed by client.");;
 	return (msg);
 }
 
@@ -89,12 +89,12 @@ void		examine_buff(char *buff, int cfd, char *dir_base)
 		send_msg("SUCCESS\nConnection closed.", cfd);
 		close(cfd);
 		ft_strdel(&dir_base);
-		ft_str3del(tab);
+		free_tab(&tab);
 		exit(0);
 	}
 	else
 		send_msg("ERROR\nCommand line.", cfd);
-	ft_str3del(tab);
+	free_tab(&tab);
 }
 
 void		forked_process(int cfd)

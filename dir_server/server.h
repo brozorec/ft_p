@@ -40,6 +40,7 @@ char		*receive_msg(int cfd);
 int			send_msg(char *buff, int cfd);
 void		send_file(char **tab, int cfd);
 void		receive_file(char *file, int cfd);
+void		accept_connections(int sfd);
 void		forked_process(int cfd);
 
 #endif

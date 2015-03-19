@@ -56,25 +56,29 @@ int			create_socket(char *port)
 	// 	fatal("listen() failed.\n");
 	while (r)
 	{
+		printf("%i\n", r->ai_family);
 		if ((sfd = socket(r->ai_family, r->ai_socktype, r->ai_protocol)) < 0)
 		{
 			ft_putstr_fd("socket() failed.\n", 2);
 		}
 		if ((i = bind(sfd, r->ai_addr, r->ai_addrlen)) == -1)
 		{
-			ft_putstr_fd("bind() failed.\n", 2);
 			close(sfd);
+			printf("%d\n", errno);
+			ft_putstr_fd("bind() failed.\n", 2);
 		}
 		else if (listen(sfd, 10) == -1)
-			fatal("listen() failed.\n");
-		if (i != -1)
-			break;
+			ft_putstr_fd("listen() failed.\n", 2);
+		if (i != -1 && fork() == 0)
+		{
+			accept_connections(sfd);
+		}
 		r = r->ai_next;
 	}
 	return (sfd);
 }
 
-void		accept_connections(int sfd, char *port)
+void		accept_connections(int sfd)
 {
 	int					cfd;
 	struct sockaddr_in	clnt_addr;
@@ -88,7 +92,6 @@ void		accept_connections(int sfd, char *port)
 		{
 			ft_putstr_fd("accept() failed.\n", 2);
 			close(cfd);
-			create_socket(port);
 		}
 		if ((child = fork()) == 0)
 		{
@@ -109,7 +112,7 @@ int			main(int ac, char **av)
 	signal(SIGCHLD, sig_child);
 	signal(SIGPIPE, sig_pipe);
 	sfd = create_socket(av[1]);
-	accept_connections(sfd, av[1]);
+	// accept_connections(sfd);
 	close(sfd);
 	return (0);
 }
